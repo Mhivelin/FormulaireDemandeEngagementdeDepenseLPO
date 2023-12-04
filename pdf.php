@@ -5,40 +5,6 @@ require 'vendor/autoload.php';
 use Dompdf\Dompdf;
 
 
-function mergePDF($pdf1, $pdf2, $output)
-{
-    $pdf = new \setasign\Fpdi\Fpdi();
-    $pageCount = $pdf->setSourceFile($pdf1);
-    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-        $templateId = $pdf->importPage($pageNo);
-        $size = $pdf->getTemplateSize($templateId);
-        $orientation = $size['width'] > $size['height'] ? 'L' : 'P';
-        $pdf->AddPage($orientation, array($size['width'], $size['height']));
-        $pdf->useTemplate($templateId);
-    }
-
-    $pageCount = $pdf->setSourceFile($pdf2);
-    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-        $templateId = $pdf->importPage($pageNo);
-        $size = $pdf->getTemplateSize($templateId);
-        $orientation = $size['width'] > $size['height'] ? 'L' : 'P';
-        $pdf->AddPage($orientation, array($size['width'], $size['height']));
-        $pdf->useTemplate($templateId);
-    }
-
-    $pdf->Output($output, 'F');
-}
-
-
-// exemple d'utilisation
-mergePDF('LPO - formulaire.pdf', 'LPO - formulaire.pdf', 'merged.pdf');
-
-
-
-
-
-
-
 
 if (isset($_POST['demandeur'])) {
 
@@ -141,10 +107,36 @@ if (isset($_POST['demandeur'])) {
 
         $allowed = array('pdf');
 
+        if (in_array($devis1ActualExt, $allowed)) {
+            if ($devis1Error === 0) {
+                if ($devis1Size < 1000000) {
+                    $devis1NameNew = uniqid('', true) . "." . $devis1ActualExt;
+                    $devis1Destination = 'uploads/' . $devis1NameNew;
+                    move_uploaded_file($devis1TmpName, $devis1Destination);
+                } else {
+                    echo "Votre fichier est trop volumineux !";
+                }
+            } else {
+                echo "Il y a eu une erreur lors du téléchargement de votre fichier !";
+            }
+        } else {
+            echo "Vous ne pouvez pas télécharger ce type de fichier !";
+        }
+    }
+
+
+
+
+
+
+
+
+
 
 
 
     $html = '
+
     <!DOCTYPE html>
     <html lang="fr">
 
@@ -156,14 +148,27 @@ if (isset($_POST['demandeur'])) {
             integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
         <link rel="stylesheet" href="assets/css/style.css">
 
+        ' . $demande . '
+        
+        <!-- saut de page -->
+        <div class="page-break"></div>
+
+        <!--  affichage des pdfs déposés -->
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Devis</h3>
+                <embed src="' . $devis1Destination . '" width="100%" height="100%" />
+            </div>
+            <div class="col-md-6">
+                <h3>Facture</h3>
+                <embed src="' . $facture1Destination . '" width="100%" height="100%" />
+            </div>
+
+
     </head>
 
-    <body>';
+    <body>
 
-    $html .= $demande;
-
-
-    $html .= '
     </body>
     </html>';
 
