@@ -34,8 +34,11 @@ foreach ($json['SERVICES'] as $service) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulaire LPO</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="assets/css/style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 
 
 
@@ -62,21 +65,23 @@ foreach ($json['SERVICES'] as $service) {
             <div class="row">
                 <div class="col-md-4">
                     <label for="demandeur">Demandeur *</label>
-                    <input type="text" class="form-control" id="demandeur" name="demandeur" placeholder="Demandeur" required>
+                    <input type="text" class="form-control" id="demandeur" name="demandeur" placeholder="Demandeur"
+                        required>
                 </div>
                 <div class="col-md-4">
                     <label for="service">Service *</label>
                     <select class="form-select" id="service" name="service" required>
                         <option selected>Choisir un service</option>
                         <?php foreach ($services as $service) : ?>
-                            <option value="<?= $service ?>"><?= $service ?></option>
+                        <option value="<?= $service ?>"><?= $service ?></option>
                         <?php endforeach; ?>
                     </select>
 
                 </div>
                 <div class="col-md-4">
                     <label for="date">Date de la demande </label>
-                    <input type="date" class="form-control" id="date" name="date" placeholder="Date" value=<?= date("Y-m-d") ?> required>
+                    <input type="date" class="form-control" id="date" name="date" placeholder="Date"
+                        value=<?= date("Y-m-d") ?> required>
                 </div>
 
             </div>
@@ -87,16 +92,19 @@ foreach ($json['SERVICES'] as $service) {
 
             <div class="mb-3">
                 <label for=" montant">Montant TTC *</label>
-                <input type="number" class="form-control" id="montant" name="montant" placeholder="Montant TTC" required>
+                <input type="number" class="form-control" id="montant" name="montant" placeholder="Montant TTC"
+                    required>
             </div>
             <div class="row mb-3">
                 <div class=" col-md">
                     <label for="fournisseur">Fournisseur *</label>
-                    <input type="text" class="form-control" id="fournisseur" name="fournisseur" placeholder="Fournisseur" required>
+                    <input type="text" class="form-control" id="fournisseur" name="fournisseur"
+                        placeholder="Fournisseur" required>
                 </div>
                 <div class="col-md">
                     <label for="mail">Mail du fournisseur *</label>
-                    <input type="email" class="form-control" id="mail" name="mail" placeholder="Mail du fournisseur" required>
+                    <input type="email" class="form-control" id="mail" name="mail" placeholder="Mail du fournisseur"
+                        required>
                 </div>
 
             </div>
@@ -104,7 +112,8 @@ foreach ($json['SERVICES'] as $service) {
 
             <div class="col-md">
                 <label for="analytique">Analytique *</label>
-                <input type="text" class="form-control" id="analytique" name="analytique" placeholder="Analytique" required>
+                <input type="text" class="form-control" id="analytique" name="analytique" placeholder="Analytique"
+                    required>
             </div>
 
             <hr class="separateur">
@@ -147,7 +156,7 @@ foreach ($json['SERVICES'] as $service) {
 
             <!-- 6. bouton : envoyer vers pdf.php -->
 
-            <button type="submit" class="btn btn-primary" id="envoyer">Envoyer</button>
+            <button class="btn btn-primary" id="envoyer">Envoyer</button>
 
 
 
@@ -162,7 +171,8 @@ foreach ($json['SERVICES'] as $service) {
 
 
     <script src="assets/js/script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@^1.16.0/dist/pdf-lib.min.js"></script>
@@ -172,6 +182,7 @@ foreach ($json['SERVICES'] as $service) {
 
 
     <script>
+    /*
         // event.preventDefault()
         const envoyer = document.querySelector('#envoyer');
 
@@ -187,7 +198,41 @@ foreach ($json['SERVICES'] as $service) {
             // envoi du formulaire
             document.querySelector('#monFormulaire').submit();
 
-        })
+        })*/
+
+    const envoyer = document.querySelector('#envoyer');
+
+    envoyer.addEventListener('click', (event) => {
+
+        event.preventDefault();
+
+
+
+        var element = document.body;
+
+        // Options pour la conversion PDF
+        var options = {
+            margin: 10,
+            filename: 'mon_fichier.pdf',
+            image: {
+                type: 'jpeg',
+                quality: 0.98
+            },
+            html2canvas: {
+                scale: 2
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            }
+        };
+
+        // Utiliser html2pdf pour générer le PDF
+        html2pdf(element, options);
+
+
+    })
     </script>
 
 

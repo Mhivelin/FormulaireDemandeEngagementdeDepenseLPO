@@ -125,16 +125,6 @@ if (isset($_POST['demandeur'])) {
     }
 
 
-
-
-
-
-
-
-
-
-
-
     $html = '
 
     <!DOCTYPE html>
@@ -147,6 +137,85 @@ if (isset($_POST['demandeur'])) {
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
             integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
         <link rel="stylesheet" href="assets/css/style.css">
+
+        <style>
+    /* Container */
+    .container {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    /* Row */
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -15px;
+        margin-left: -15px;
+    }
+
+    /* Col */
+    .col-md-4, .col-md-8, .col-md {
+        position: relative;
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
+    /* Spécifique pour col-md-4 et col-md-8 */
+    .col-md-4 {
+        flex: 0 0 auto;
+        width: 33.33333%;
+    }
+    .col-md-8 {
+        flex: 0 0 auto;
+        width: 66.66667%;
+    }
+
+    /* Form Control */
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+    }
+
+    /* Form Select */
+    .form-select {
+        display: block;
+        width: 100%;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+    }
+
+    /* Margin Bottom */
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+
+    /* Separateur */
+    .separateur {
+        border-top: 1px solid #e9ecef;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
+</head>
+
+    <body>
+
 
         ' . $demande . '
         
@@ -165,16 +234,16 @@ if (isset($_POST['demandeur'])) {
             </div>
 
 
-    </head>
-
-    <body>
+    
 
     </body>
     </html>';
 
 
-    echo $html;
-
-    // Output the generated PDF (Exemple : le télécharger)
-    $dompdf->stream("document.pdf", array("Attachment" => 1));
+    // generate pdf
+    $dompdf = new Dompdf();
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+    $dompdf->stream("document.pdf", array("Attachment" => true));
 }
