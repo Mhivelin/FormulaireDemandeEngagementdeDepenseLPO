@@ -32,7 +32,7 @@ function creerPDFDepuisHTML($html, $nomDuFichier)
     $pdf->writeHTML($html, true, false, true, false, '');
 
     // Enregistrer le document sur le serveur au nom du fichier indiqué
-    $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $nomDuFichier . '.pdf';
+    $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $nomDuFichier . '.pdf';
 
     $pdf->Output($cheminDuFichier, 'F');
 }
@@ -79,14 +79,14 @@ function concatenerPDF($fichier1, $fichier2, $fichierSortie)
 
 
     // Enregistrer le nouveau PDF
-    $fichierSortie = $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $fichierSortie . '.pdf';
+    $fichierSortie = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $fichierSortie . '.pdf';
     $pdf->Output($fichierSortie, 'F');
 }
 
 
 function telechargerPDF($fichier, $nomDuFichier)
 {
-    $fichier = $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $fichier . '.pdf';
+    $fichier = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $fichier . '.pdf';
     header('Content-Type: application/pdf');
     header('Content-Disposition: attachment; filename="' . $fichier . '"');
     readfile($fichier);
@@ -242,7 +242,7 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
             if ($_FILES["devis$i"]["name"] != "") {
                 $fileTmpPath = $_FILES["devis$i"]['tmp_name'];
                 $fileName = $_FILES["devis$i"]['name'];
-                $dest_path = $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . "(" . $i + 1 . ").pdf";
+                $dest_path = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(" . $i + 1 . ").pdf";
 
                 // Déplacer le fichier dans le dossier de destination
                 if (move_uploaded_file($fileTmpPath, $dest_path)) {
@@ -255,13 +255,13 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
     }
 
     // Concatener les fichiers
-    concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . "(1).pdf", $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
-    concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . "(3).pdf", $LPODEDNUMBER);
+    concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
+    concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf", $LPODEDNUMBER);
 
 
     // telecharger le fichier dans le navigateur temporaire
 
-    $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . '.pdf';
+    $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . '.pdf';
 
     header('Content-Description: File Transfer');
     header('Content-Type: application/pdf');
