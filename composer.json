@@ -1,17 +1,6 @@
 {
-    "name": "mhivelin/test",
-    "autoload": {
-        "psr-4": {
-            "Mhivelin\\Test\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "Mhivelin",
-            "email": "marius.hivelin@yahoo.fr"
-        }
-    ],
     "require": {
-        "dompdf/dompdf": "^2.0"
+        "tecnickcom/tcpdf": "^6.6",
+        "setasign/fpdi-tcpdf": "^2.3"
     }
 }

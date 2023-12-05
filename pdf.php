@@ -1,15 +1,103 @@
 <?php
+require_once('tcpdf/tcpdf.php'); // Assurez-vous que le chemin d'accès à TCPDF est correct
 
-require 'vendor/autoload.php';
+function creerPDFDepuisHTML($html, $nomDuFichier)
+{
+    // Créer un nouvel objet PDF
+    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
-use Dompdf\Dompdf;
+    // Définir les informations du document
+    $pdf->SetCreator(PDF_CREATOR);
+
+
+    // Définir l'en-tête et le pied de page
+    $pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+    $pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+
+    // Définir les marges
+    $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+    $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+    // Définir les sauts de page automatiques
+    $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+    // Définir la police par défaut
+    $pdf->SetFont('dejavusans', '', 10);
+
+    // Ajouter une page
+    $pdf->AddPage();
+
+    // Écrire le contenu HTML
+    $pdf->writeHTML($html, true, false, true, false, '');
+
+    // Enregistrer le document sur le serveur au nom du fichier indiqué
+    $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $nomDuFichier . '.pdf';
+
+    $pdf->Output($cheminDuFichier, 'F');
+}
+
+require_once 'vendor/autoload.php';
+
+use setasign\Fpdi\Tcpdf\Fpdi;
+
+function concatenerPDF($fichier1, $fichier2, $fichierSortie)
+{
 
 
 
-if (isset($_POST['demandeur'])) {
+
+    $pdf = new Fpdi();
+
+    // Charger le premier PDF
+    $pageCount = $pdf->setSourceFile($fichier1);
+    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+        $tplId = $pdf->importPage($pageNo);
+        $pdf->AddPage();
+        $pdf->useTemplate($tplId, ['adjustPageSize' => true]);
+    }
 
 
-    /* ----------------------------------------------- partie 1 : récupération des données du formulaire ----------------------------------------------- */
+
+    // page de séparation
+    $pdf->AddPage();
+    $pdf->SetFont('Helvetica');
+    $pdf->Cell(0, 10, 'DECOUPER ICI', 0, 1, 'C');
+
+
+
+    // Charger le deuxième PDF
+    $pageCount = $pdf->setSourceFile($fichier2);
+    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+        $tplId = $pdf->importPage($pageNo);
+        $pdf->AddPage();
+        $pdf->useTemplate($tplId, ['adjustPageSize' => true]);
+    }
+
+
+
+
+
+    // Enregistrer le nouveau PDF
+    $fichierSortie = $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $fichierSortie . '.pdf';
+    $pdf->Output($fichierSortie, 'F');
+}
+
+
+function telechargerPDF($fichier, $nomDuFichier)
+{
+    $fichier = $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $fichier . '.pdf';
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: attachment; filename="' . $fichier . '"');
+    readfile($fichier);
+}
+
+
+
+// generation du pdf
+// recuperaion des données
+
+if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date']) && isset($_POST['montant']) && isset($_POST['fournisseur']) && isset($_POST['mail']) && isset($_POST['analytique']) && isset($_POST['LPODEDNUMBER'])) {
     $demandeur = $_POST['demandeur'];
     $service = $_POST['service'];
     $date = $_POST['date'];
@@ -17,129 +105,42 @@ if (isset($_POST['demandeur'])) {
     $fournisseur = $_POST['fournisseur'];
     $mail = $_POST['mail'];
     $analytique = $_POST['analytique'];
+    $commentaire = $_POST['commentaire'];
     $LPODEDNUMBER = $_POST['LPODEDNUMBER'];
 
-    $demande = '
-        <div class="container" id="pdf">
-            <div class="row align-items-center mb-4">
-                <div class="col-md-4">
-                    <img src="assets/img/logoLPO.png" alt="logo LPO" class="img-fluid" />
-                </div>
-                <div class="col-md-8 ">
-                    <h1>Demande d\'Engagement de Dépense</h1>
-                    <h4 id="lpo-ded">LPO - DED N° ' . $LPODEDNUMBER . '</h4>
-                    <p> Merci de reprendre en compte le numéro de la demande ci-dessus dans vos factures !</p>
-                </div>
-            </div>
-
-            <hr class="separateur">
-
-            <form id="monFormulaire" action="./pdf.php" method="POST" enctype="multipart/form-data">
-                <!-- 1. Identification du demandeur champs : demandeur, service, date de la demande -->
-                <div class="row">
-                    <div class="col-md-4">
-                        <label for="demandeur">Demandeur </label>
-                        <input type="text" class="form-control" id="demandeur" name="demandeur" placeholder="Demandeur"
-                            required value=' . $demandeur . '>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="service">Service </label>
-                        <select class="form-select" id="service" name="service" required>
-                            <option selected>Choisir un service</option>
-                            
-                            <option value="' . $service . '">' . $service . '</option>
-            
-                        </select>
-
-                    </div>
-                    <div class="col-md-4">
-                        <label for="date">Date de la demande </label>
-                        <input type="date" class="form-control" id="date" name="date" placeholder="Date"
-                            value=' . $date . ' required>
-                    </div>
-
-                    </div>
-
-                    <hr class="separateur">
-
-                    <!-- 2. champs : Montant TTC, Fournisseur, mail du fournisseur, analytique -->
-
-                    <div class="mb-3">
-                        <label for=" montant">Montant TTC </label>
-                        <input type="number" class="form-control" id="montant" name="montant" placeholder="Montant TTC" required value=' . $montant . '>
-                    </div>
-                    <div class="row mb-3">
-                        <div class=" col-md">
-                            <label for="fournisseur">Fournisseur </label>
-                            <input type="text" class="form-control" id="fournisseur" name="fournisseur" placeholder="Fournisseur" required value=' . $fournisseur . '>
-                        </div>
-                        <div class="col-md">
-                            <label for="mail">Mail du fournisseur </label>
-                            <input type="email" class="form-control" id="mail" name="mail" placeholder="Mail du fournisseur" required value=' . $mail . '>
-                        </div>
-                    </div>
-                    <div class="col-md">
-                        <label for="analytique">Analytique </label>
-                        <input type="text" class="form-control" id="analytique" name="analytique" placeholder="Analytique" required value=' . $analytique . '>
-                    </div>
-                    <hr class="separateur">
-
-                    <div class="mb-3">
-                        <label for="commentaire">Commentaire</label>
-                        <textarea class="form-control" id="commentaire" name="commentaire" rows="3"></textarea value=' . $commentaire . '>
-                    </div>
-                    </form>
-                    </div>';
 
 
-    /* ----------------------------------------------- partie 2 : recupération des pdfs déposés ----------------------------------------------- */
-
-    if (isset($_FILES['devis1'])) {
-        $devis1 = $_FILES['devis1'];
-        $devis1Name = $_FILES['devis1']['name'];
-        $devis1TmpName = $_FILES['devis1']['tmp_name'];
-        $devis1Size = $_FILES['devis1']['size'];
-        $devis1Error = $_FILES['devis1']['error'];
-        $devis1Type = $_FILES['devis1']['type'];
-
-        $devis1Ext = explode('.', $devis1Name);
-        $devis1ActualExt = strtolower(end($devis1Ext));
-
-        $allowed = array('pdf');
-
-        if (in_array($devis1ActualExt, $allowed)) {
-            if ($devis1Error === 0) {
-                if ($devis1Size < 1000000) {
-                    $devis1NameNew = uniqid('', true) . "." . $devis1ActualExt;
-                    $devis1Destination = 'uploads/' . $devis1NameNew;
-                    move_uploaded_file($devis1TmpName, $devis1Destination);
-                } else {
-                    echo "Votre fichier est trop volumineux !";
-                }
-            } else {
-                echo "Il y a eu une erreur lors du téléchargement de votre fichier !";
-            }
-        } else {
-            echo "Vous ne pouvez pas télécharger ce type de fichier !";
-        }
-    }
 
 
     $html = '
+<!DOCTYPE html>
+<html lang="fr">
 
-    <!DOCTYPE html>
-    <html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Formulaire LPO</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-        <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+    p {
+        font-family: helvetica, sans-serif;
+        font-size: 12pt;
+        color: #333333;
+        bo
+    }
 
-        <style>
-    /* Container */
+    label {
+        font-family: helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 14pt;
+        color: #000000;
+    }
+
+    td {
+        height: 100px;
+    }
+
+
+
     .container {
         width: 100%;
         padding-right: 15px;
@@ -147,103 +148,132 @@ if (isset($_POST['demandeur'])) {
         margin-right: auto;
         margin-left: auto;
     }
-
-    /* Row */
-    .row {
-        display: flex;
-        flex-wrap: wrap;
-        margin-right: -15px;
-        margin-left: -15px;
-    }
-
-    /* Col */
-    .col-md-4, .col-md-8, .col-md {
-        position: relative;
-        width: 100%;
-        padding-right: 15px;
-        padding-left: 15px;
-    }
-
-    /* Spécifique pour col-md-4 et col-md-8 */
-    .col-md-4 {
-        flex: 0 0 auto;
-        width: 33.33333%;
-    }
-    .col-md-8 {
-        flex: 0 0 auto;
-        width: 66.66667%;
-    }
-
-    /* Form Control */
-    .form-control {
-        display: block;
-        width: 100%;
-        padding: .375rem .75rem;
-        font-size: 1rem;
-        line-height: 1.5;
-        color: #212529;
-        background-color: #fff;
-        border: 1px solid #ced4da;
-        border-radius: .25rem;
-    }
-
-    /* Form Select */
-    .form-select {
-        display: block;
-        width: 100%;
-        padding: .375rem .75rem;
-        font-size: 1rem;
-        line-height: 1.5;
-        color: #212529;
-        background-color: #fff;
-        border: 1px solid #ced4da;
-        border-radius: .25rem;
-    }
-
-    /* Margin Bottom */
-    .mb-3 {
-        margin-bottom: 1rem;
-    }
-
-    /* Separateur */
-    .separateur {
-        border-top: 1px solid #e9ecef;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-    }
-</style>
+    </style>
 </head>
 
-    <body>
+<body>
+    <div class = container>
 
-
-        ' . $demande . '
+    <table>
+        <tr>
+            <td width="20%">
+                <img src="assets/img/logoLPO.png" alt="logo LPO" />
+            </td>
+            <td width="10%"></td>
+            <td width="70%">
+                <h1>Demande d\'Engagement de Dépense</h1>
+                <h4>LPO - DED N° ' . $LPODEDNUMBER . '</h4>
+                <p>Merci de reprendre en compte le numéro de la demande ci-dessus dans vos factures !</p>
+            </td>
+        </tr>
         
-        <!-- saut de page -->
-        <div class="page-break"></div>
-
-        <!--  affichage des pdfs déposés -->
-        <div class="row">
-            <div class="col-md-6">
-                <h3>Devis</h3>
-                <embed src="' . $devis1Destination . '" width="100%" height="100%" />
-            </div>
-            <div class="col-md-6">
-                <h3>Facture</h3>
-                <embed src="' . $facture1Destination . '" width="100%" height="100%" />
-            </div>
-
+    </table>
 
     
+    <br>
 
-    </body>
-    </html>';
+    <hr>
+    <table>
+        
+        <tr width="100%">
+            <td width="40%">
+                <label for="demandeur">Demandeur </label>
+                <p>' . $demandeur . '</p>
+            </td>
+            <td width="40%">
+                <label for="service">Service </label>
+                <p>' . $service . '</p>
+            </td>
+            <td width="40%">
+                <label for="date">Date de la demande </label>
+                <p>' . $date . '</p>
+            </td>
+        </tr>
+    </table>
+    <hr>
+    <table>
+        <tr width="100%">
+            <td width="40%">
+                <label for="montant">Montant TTC </label>
+                <p>' . $montant . '</p>
+            </td>
+            <td width="40%">
+                <label for="fournisseur">Fournisseur </label>
+                <p>' . $fournisseur . '</p>
+            </td>
+            <td width="40%">
+                <label for="mail">Mail du fournisseur </label>
+                <p>' . $mail . '</p>
+            </td>
+        </tr>
+    </table>
+    <hr>
+    <table>
+        <tr width="100%">
+            <td width="50%">
+                <label for="analytique">Analytique </label>
+                <p>' . $analytique . '</p>
+            </td>
+            <td width="50%">
+                <label for="commentaire">Commentaire</label>
+                <p>' . $commentaire . '</p>
+            </td>
+        </tr>
+    </table>
+
+    </div>
+
+</body>
+
+</html>
+
+        ';
 
 
-    // generate pdf
-    $dompdf = new Dompdf();
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('A4', 'portrait');
-    $dompdf->render();
-    $dompdf->stream("document.pdf", array("Attachment" => true));
+
+    creerPDFDepuisHTML($html, $LPODEDNUMBER . "(1)");
+
+
+
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Traitement pour chaque devis
+        for ($i = 1; $i <= 3; $i++) {
+            if ($_FILES["devis$i"]["name"] != "") {
+                $fileTmpPath = $_FILES["devis$i"]['tmp_name'];
+                $fileName = $_FILES["devis$i"]['name'];
+                $dest_path = $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . "(" . $i + 1 . ").pdf";
+
+                // Déplacer le fichier dans le dossier de destination
+                if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                    echo "Le devis $i a été uploadé avec succès.<br />";
+                } else {
+                    echo "Erreur lors de l'upload du devis $i.<br />";
+                }
+            }
+        }
+    }
+
+    // Concatener les fichiers
+    concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . "(1).pdf", $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
+    concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . "(3).pdf", $LPODEDNUMBER);
+
+
+    // telecharger le fichier dans le navigateur temporaire
+
+    $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'DELTIC/LPO/pdfs/' . $LPODEDNUMBER . '.pdf';
+
+    header('Content-Description: File Transfer');
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: attachment; filename="' . basename($cheminDuFichier) . '"');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate');
+    header('Pragma: public');
+    header('Content-Length: ' . filesize($cheminDuFichier));
+
+    ob_clean(); // Clean output buffer
+
+    flush(); // Flush system output buffer
+
+    readfile($cheminDuFichier);
 }

@@ -92,8 +92,8 @@ foreach ($json['SERVICES'] as $service) {
 
             <div class="mb-3">
                 <label for=" montant">Montant TTC *</label>
-                <input type="number" class="form-control" id="montant" name="montant" placeholder="Montant TTC"
-                    required>
+                <input type="number" step="0.01" class="form-control" id="montant" name="montant"
+                    placeholder="Montant TTC" required>
             </div>
             <div class="row mb-3">
                 <div class=" col-md">
@@ -160,14 +160,8 @@ foreach ($json['SERVICES'] as $service) {
 
 
 
-
-
-
-
         </form>
     </div>
-
-
 
 
     <script src="assets/js/script.js"></script>
@@ -182,57 +176,7 @@ foreach ($json['SERVICES'] as $service) {
 
 
     <script>
-    /*
-        // event.preventDefault()
-        const envoyer = document.querySelector('#envoyer');
 
-        envoyer.addEventListener('click', (event) => {
-            event.preventDefault();
-
-            // recupération l'eement <html> du document
-            const html = document.querySelector('html').outerHTML;
-
-            // injection de la page html dans le champ caché html
-            document.querySelector('#html').value = html;
-
-            // envoi du formulaire
-            document.querySelector('#monFormulaire').submit();
-
-        })*/
-
-    const envoyer = document.querySelector('#envoyer');
-
-    envoyer.addEventListener('click', (event) => {
-
-        event.preventDefault();
-
-
-
-        var element = document.body;
-
-        // Options pour la conversion PDF
-        var options = {
-            margin: 10,
-            filename: 'mon_fichier.pdf',
-            image: {
-                type: 'jpeg',
-                quality: 0.98
-            },
-            html2canvas: {
-                scale: 2
-            },
-            jsPDF: {
-                unit: 'mm',
-                format: 'a4',
-                orientation: 'portrait'
-            }
-        };
-
-        // Utiliser html2pdf pour générer le PDF
-        html2pdf(element, options);
-
-
-    })
     </script>
 
 
