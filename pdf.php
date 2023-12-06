@@ -242,8 +242,9 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
             if ($_FILES["devis$i"]["name"] != "") {
                 $fileTmpPath = $_FILES["devis$i"]['tmp_name'];
                 $fileName = $_FILES["devis$i"]['name'];
-                $dest_path = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(" . $i + 1 . ").pdf";
+                $dest_path = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(" . ($i + 1) . ").pdf";
 
+                echo $dest_path;
                 // Déplacer le fichier dans le dossier de destination
                 if (move_uploaded_file($fileTmpPath, $dest_path)) {
                     echo "Le devis $i a été uploadé avec succès.<br />";
@@ -257,9 +258,16 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
     // Concatener les fichiers
     concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
     concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf", $LPODEDNUMBER);
+    
+    // Supprimer les fichiers temporaires
+    unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf");
+    unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf");
+    unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf");
+    unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf");
+    
 
 
-    // telecharger le fichier dans le navigateur temporaire
+    // telecharger le fichier dans le navigateur TEMPORAIRE
 
     $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . '.pdf';
 
