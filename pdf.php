@@ -256,20 +256,68 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
     }
 
     // Concatener les fichiers
+        
+    // recuperer tout les pdfs contenant le numéro de la demande
+    $files = glob($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/*' . $LPODEDNUMBER . "*.pdf");
+
+
     concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
-    concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf", $LPODEDNUMBER);
+
+    // parcourir les fichiers sauf les deux premiers
+    for ($i = 2; $i < count($files); $i++) {
+        concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $files[$i], $LPODEDNUMBER . "tmp");
+    }
+
+    // renommer le fichier tmp en pdf
+    rename($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/LPO-DED-' . $LPODEDNUMBER . ".pdf");
+  
+
+    
+    
+
+    
+
+
+    
+
+
+
+    /*
+    concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
+    if ($_FILES["devis3"]["name"] != "") {
+        concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf", $LPODEDNUMBER);
+    } else {
+        rename($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . ".pdf");
+    }*/
+
+    
     
     // Supprimer les fichiers temporaires
-    unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf");
-    unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf");
-    unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf");
-    unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf");
+    
+    if (file_exists($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf")) {
+        unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf");
+    }
+    if (file_exists($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf")) {
+        unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf");
+    }
+    if (file_exists($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf")) {
+        unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf");
+    }
+    if (file_exists($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(4).pdf")) {
+        unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(4).pdf");
+    }
+    if (file_exists($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf")) {
+        unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf");
+    }
+
+    
+
     
 
 
     // telecharger le fichier dans le navigateur TEMPORAIRE
 
-    $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . '.pdf';
+    $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/LPO-DED-' . $LPODEDNUMBER . ".pdf";
 
     header('Content-Description: File Transfer');
     header('Content-Type: application/pdf');

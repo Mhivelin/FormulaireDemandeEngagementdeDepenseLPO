@@ -6,7 +6,7 @@ $json = file_get_contents('assets/json/data.json');
 $numDED = json_decode($json)->LPODEDNUMBER;
 
 // completer le numero de DED avec des 0 pour avoir 4 chiffres
-$number = str_pad($numDED, 4, '0', STR_PAD_LEFT);
+$number = str_pad($numDED, 5, '0', STR_PAD_LEFT);
 
 $LPODEDNUMBER = date("Y") . $number;
 
@@ -126,8 +126,8 @@ foreach ($json['SERVICES'] as $service) {
                     <input type="file" class="form-control" id="devis1" name="devis1" accept=".pdf" required>
                 </div>
                 <div class="col-md">
-                    <label for="devis2">Devis 2 *</label>
-                    <input type="file" class="form-control" id="devis2" name="devis2" accept=".pdf" required>
+                    <label for="devis2">Devis 2</label>
+                    <input type="file" class="form-control" id="devis2" name="devis2" accept=".pdf">
                 </div>
                 <div class="col-md">
                     <label for="devis3">Devis 3</label>
