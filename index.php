@@ -23,6 +23,12 @@ foreach ($json['SERVICES'] as $service) {
     $services[] = $service;
 }
 
+// recupération de la liste des fournisseurs
+require_once 'assets/bdd/fournisseurs.php';
+
+// recupération de la liste des analytiques
+require_once 'assets/bdd/analytiques.php';
+
 
 
 ?>
@@ -63,12 +69,17 @@ foreach ($json['SERVICES'] as $service) {
         <form id="monFormulaire" action="./pdf.php" method="POST" enctype="multipart/form-data">
             <!-- 1. Identification du demandeur champs : demandeur, service, date de la demande -->
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md">
                     <label for="demandeur">Demandeur *</label>
                     <input type="text" class="form-control" id="demandeur" name="demandeur" placeholder="Demandeur"
                         required>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md">
+                    <label for="mail">Mail du demandeur *</label>
+                    <input type="email" class="form-control" id="mail" name="mail" placeholder="Mail du demandeur"
+                        required>
+                </div>
+                <div class="col-md">
                     <label for="service">Service *</label>
                     <select class="form-select" id="service" name="service" required>
                         <option selected>Choisir un service</option>
@@ -78,7 +89,7 @@ foreach ($json['SERVICES'] as $service) {
                     </select>
 
                 </div>
-                <div class="col-md-4">
+                <div class="col-md">
                     <label for="date">Date de la demande </label>
                     <input type="date" class="form-control" id="date" name="date" placeholder="Date"
                         value=<?= date("Y-m-d") ?> required>
@@ -98,8 +109,13 @@ foreach ($json['SERVICES'] as $service) {
             <div class="row mb-3">
                 <div class=" col-md">
                     <label for="fournisseur">Fournisseur *</label>
-                    <input type="text" class="form-control" id="fournisseur" name="fournisseur"
-                        placeholder="Fournisseur" required>
+                    <select class="form-select" id="fournisseur" name="fournisseur" required>
+                        <option selected>Choisir un fournisseur</option>
+                        <?php foreach ($fournisseurs as $fournisseur) : ?>
+                        <option value="<?= $fournisseur ?>"><?= $fournisseur ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    
                 </div>
                 <div class="col-md">
                     <label for="mail">Mail du fournisseur *</label>
@@ -112,8 +128,11 @@ foreach ($json['SERVICES'] as $service) {
 
             <div class="col-md">
                 <label for="analytique">Analytique *</label>
-                <input type="text" class="form-control" id="analytique" name="analytique" placeholder="Analytique"
-                    required>
+                <select class="form-select" id="analytique" name="analytique" required>
+                    <option selected>Choisir un analytique</option>
+                    <?php foreach ($analytiques as $analytique) : ?>
+                    <option value="<?= $analytique ?>"><?= $analytique ?></option>
+                    <?php endforeach; ?>
             </div>
 
             <hr class="separateur">

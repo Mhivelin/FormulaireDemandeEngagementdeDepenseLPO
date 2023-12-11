@@ -1,5 +1,10 @@
 <?php
-require_once('tcpdf/tcpdf.php'); // Assurez-vous que le chemin d'accès à TCPDF est correct
+
+file_put_contents('./pdfs/exemple.txt', 'Ecriture dans un fichier');
+
+require __DIR__ . '/vendor/autoload.php';
+
+
 
 function creerPDFDepuisHTML($html, $nomDuFichier)
 {
@@ -32,7 +37,9 @@ function creerPDFDepuisHTML($html, $nomDuFichier)
     $pdf->writeHTML($html, true, false, true, false, '');
 
     // Enregistrer le document sur le serveur au nom du fichier indiqué
-    $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $nomDuFichier . '.pdf';
+    $cheminDuFichier = __DIR__ . '/pdfs/' . $nomDuFichier . '.pdf';
+
+	echo $cheminDuFichier;
 
     $pdf->Output($cheminDuFichier, 'F');
 }
@@ -79,14 +86,15 @@ function concatenerPDF($fichier1, $fichier2, $fichierSortie)
 
 
     // Enregistrer le nouveau PDF
-    $fichierSortie = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $fichierSortie . '.pdf';
+    $fichierSortie = __DIR__ . '/pdfs/' . $fichierSortie . '.pdf'; 
     $pdf->Output($fichierSortie, 'F');
+
 }
 
 
 function telechargerPDF($fichier, $nomDuFichier)
 {
-    $fichier = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $fichier . '.pdf';
+    $fichier = __DIR__ . '/pdfs/' . $fichier . '.pdf';
     header('Content-Type: application/pdf');
     header('Content-Disposition: attachment; filename="' . $fichier . '"');
     readfile($fichier);
@@ -242,7 +250,7 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
             if ($_FILES["devis$i"]["name"] != "") {
                 $fileTmpPath = $_FILES["devis$i"]['tmp_name'];
                 $fileName = $_FILES["devis$i"]['name'];
-                $dest_path = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(" . ($i + 1) . ").pdf";
+                $dest_path = __DIR__ . '/pdfs/' . $LPODEDNUMBER . "(" . ($i + 1) . ").pdf";
 
                 echo $dest_path;
                 // Déplacer le fichier dans le dossier de destination
@@ -258,18 +266,18 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
     // Concatener les fichiers
         
     // recuperer tout les pdfs contenant le numéro de la demande
-    $files = glob($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/*' . $LPODEDNUMBER . "*.pdf");
+    $files = glob(__DIR__ . '/pdfs/*' . $LPODEDNUMBER . "*.pdf");
 
 
-    concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
+    concatenerPDF(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(1).pdf", __DIR__ . '/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
 
     // parcourir les fichiers sauf les deux premiers
     for ($i = 2; $i < count($files); $i++) {
-        concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $files[$i], $LPODEDNUMBER . "tmp");
+        concatenerPDF(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $files[$i], $LPODEDNUMBER . "tmp");
     }
 
     // renommer le fichier tmp en pdf
-    rename($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/LPO-DED-' . $LPODEDNUMBER . ".pdf");
+    rename(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf", __DIR__ . '/pdfs/LPO-DED-' . $LPODEDNUMBER . ".pdf");
   
 
     
@@ -282,32 +290,32 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
 
 
 
-    /*
-    concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
+    
+    concatenerPDF(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(1).pdf", __DIR__ . '/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
     if ($_FILES["devis3"]["name"] != "") {
-        concatenerPDF($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf", $LPODEDNUMBER);
+        concatenerPDF(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf", __DIR__ . '/pdfs/' . $LPODEDNUMBER . "(3).pdf", $LPODEDNUMBER);
     } else {
-        rename($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . ".pdf");
-    }*/
+        rename(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf", __DIR__ . '/pdfs/' . $LPODEDNUMBER . ".pdf");
+    }
 
     
     
     // Supprimer les fichiers temporaires
     
-    if (file_exists($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf")) {
-        unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(1).pdf");
+    if (file_exists(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(1).pdf")) {
+        unlink(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(1).pdf");
     }
-    if (file_exists($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf")) {
-        unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(2).pdf");
+    if (file_exists(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(2).pdf")) {
+        unlink(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(2).pdf");
     }
-    if (file_exists($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf")) {
-        unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(3).pdf");
+    if (file_exists(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(3).pdf")) {
+        unlink(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(3).pdf");
     }
-    if (file_exists($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(4).pdf")) {
-        unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "(4).pdf");
+    if (file_exists(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(4).pdf")) {
+        unlink(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(4).pdf");
     }
-    if (file_exists($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf")) {
-        unlink($_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/' . $LPODEDNUMBER . "tmp.pdf");
+    if (file_exists(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf")) {
+        unlink(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf");
     }
 
     
@@ -317,7 +325,9 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
 
     // telecharger le fichier dans le navigateur TEMPORAIRE
 
-    $cheminDuFichier = $_SERVER['DOCUMENT_ROOT'] . 'FormulaireDemandeEngagementdeDepenseLPO/pdfs/LPO-DED-' . $LPODEDNUMBER . ".pdf";
+    $cheminDuFichier = __DIR__ . '/pdfs/LPO-DED-' . $LPODEDNUMBER . ".pdf";
+	
+
 
     header('Content-Description: File Transfer');
     header('Content-Type: application/pdf');
@@ -332,4 +342,7 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
     flush(); // Flush system output buffer
 
     readfile($cheminDuFichier);
+	
+	
+
 }
