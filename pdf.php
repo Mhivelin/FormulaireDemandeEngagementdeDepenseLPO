@@ -1,6 +1,6 @@
 <?php
 
-file_put_contents('./pdfs/exemple.txt', 'Ecriture dans un fichier');
+
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -37,7 +37,7 @@ function creerPDFDepuisHTML($html, $nomDuFichier)
     $pdf->writeHTML($html, true, false, true, false, '');
 
     // Enregistrer le document sur le serveur au nom du fichier indiqué
-    $cheminDuFichier = __DIR__ . '/pdfs/' . $nomDuFichier . '.pdf';
+    $cheminDuFichier = __DIR__ . '/pdfs/DED/' . $nomDuFichier . '.pdf';
 
 	echo $cheminDuFichier;
 
@@ -48,48 +48,7 @@ require_once 'vendor/autoload.php';
 
 use setasign\Fpdi\Tcpdf\Fpdi;
 
-function concatenerPDF($fichier1, $fichier2, $fichierSortie)
-{
 
-
-
-
-    $pdf = new Fpdi();
-
-    // Charger le premier PDF
-    $pageCount = $pdf->setSourceFile($fichier1);
-    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-        $tplId = $pdf->importPage($pageNo);
-        $pdf->AddPage();
-        $pdf->useTemplate($tplId, ['adjustPageSize' => true]);
-    }
-
-
-
-    // page de séparation
-    $pdf->AddPage();
-    $pdf->SetFont('Helvetica');
-    $pdf->Cell(0, 10, 'DECOUPER ICI', 0, 1, 'C');
-
-
-
-    // Charger le deuxième PDF
-    $pageCount = $pdf->setSourceFile($fichier2);
-    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-        $tplId = $pdf->importPage($pageNo);
-        $pdf->AddPage();
-        $pdf->useTemplate($tplId, ['adjustPageSize' => true]);
-    }
-
-
-
-
-
-    // Enregistrer le nouveau PDF
-    $fichierSortie = __DIR__ . '/pdfs/' . $fichierSortie . '.pdf'; 
-    $pdf->Output($fichierSortie, 'F');
-
-}
 
 
 function telechargerPDF($fichier, $nomDuFichier)
@@ -105,6 +64,7 @@ function telechargerPDF($fichier, $nomDuFichier)
 // generation du pdf
 // recuperaion des données
 
+/*
 if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date']) && isset($_POST['montant']) && isset($_POST['fournisseur']) && isset($_POST['mail']) && isset($_POST['analytique']) && isset($_POST['LPODEDNUMBER'])) {
     $demandeur = $_POST['demandeur'];
     $service = $_POST['service'];
@@ -115,6 +75,76 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
     $analytique = $_POST['analytique'];
     $commentaire = $_POST['commentaire'];
     $LPODEDNUMBER = $_POST['LPODEDNUMBER'];
+*/
+
+
+// Validation et nettoyage des données d'entrée
+function clean_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+
+// Vérification des données POST
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (empty($_POST["demandeur"])) {
+        $demandeurErr = "Le nom du demandeur est requis";
+    } else {
+        $demandeur = clean_input($_POST["demandeur"]);
+    
+    }
+
+    if (empty($_POST["service"])) {
+        $serviceErr = "Le service est requis";
+    } else {
+        $service = clean_input($_POST["service"]);
+    }
+
+    if (empty($_POST["date"])) {
+        $dateErr = "La date est requise";
+    } else {
+        $date = clean_input($_POST["date"]);
+    }
+
+    if (empty($_POST["montant"])) {
+        $montantErr = "Le montant est requis";
+    } else {
+        $montant = clean_input($_POST["montant"]);
+    }
+
+    if (empty($_POST["fournisseur"])) {
+        $fournisseurErr = "Le fournisseur est requis";
+    } else {
+        $fournisseur = clean_input($_POST["fournisseur"]);
+    }
+
+    if (empty($_POST["mail"])) {
+        $mailErr = "Le mail du fournisseur est requis";
+    } else {
+        $mail = clean_input($_POST["mail"]);
+    }
+
+    if (empty($_POST["analytique"])) {
+        $analytiqueErr = "L'analytique est requis";
+    } else {
+        $analytique = clean_input($_POST["analytique"]);
+    }
+
+    if (empty($_POST["commentaire"])) {
+        $commentaire = "";
+    } else {
+        $commentaire = clean_input($_POST["commentaire"]);
+    }
+
+    if (empty($_POST["LPODEDNUMBER"])) {
+        $LPODEDNUMBERErr = "Le numéro de la demande est requis";
+    } else {
+        $LPODEDNUMBER = clean_input($_POST["LPODEDNUMBER"]);
+    }
+
+    
+    
 
 
 
@@ -129,32 +159,52 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-    p {
+    body {
         font-family: helvetica, sans-serif;
-        font-size: 12pt;
         color: #333333;
-        bo
     }
 
-    label {
-        font-family: helvetica, sans-serif;
+    .container {
+        width: 90%;
+        margin: 0 auto;
+        padding: 15px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .group {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+
+    .group label {
         font-weight: bold;
         font-size: 14pt;
-        color: #000000;
+        display: block;
+        margin-bottom: 5px;
+        margin-top: 10px;
+    }
+
+    .group p {
+        font-size: 12pt;
+        margin: 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
     }
 
     td {
-        height: 100px;
-    }
-
-
-
-    .container {
-        width: 100%;
-        padding-right: 15px;
-        padding-left: 15px;
-        margin-right: auto;
-        margin-left: auto;
+        padding: 10px;
+        border: 1px solid #ddd;
     }
     </style>
 </head>
@@ -167,7 +217,6 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
             <td width="20%">
                 <img src="assets/img/logoLPO.png" alt="logo LPO" />
             </td>
-            <td width="10%"></td>
             <td width="70%">
                 <h1>Demande d\'Engagement de Dépense</h1>
                 <h4>LPO - DED N° ' . $LPODEDNUMBER . '</h4>
@@ -177,80 +226,90 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
         
     </table>
 
-    
+    <br>
+    <hr class="separateur">
     <br>
 
-    <hr>
-    <table>
-        
-        <tr width="100%">
-            <td width="40%">
-                <label for="demandeur">Demandeur </label>
-                <p>' . $demandeur . '</p>
-            </td>
-            <td width="40%">
-                <label for="service">Service </label>
-                <p>' . $service . '</p>
-            </td>
-            <td width="40%">
-                <label for="date">Date de la demande </label>
-                <p>' . $date . '</p>
-            </td>
-        </tr>
-    </table>
-    <hr>
-    <table>
-        <tr width="100%">
-            <td width="40%">
-                <label for="montant">Montant TTC </label>
-                <p>' . $montant . '</p>
-            </td>
-            <td width="40%">
-                <label for="fournisseur">Fournisseur </label>
-                <p>' . $fournisseur . '</p>
-            </td>
-            <td width="40%">
-                <label for="mail">Mail du fournisseur </label>
-                <p>' . $mail . '</p>
-            </td>
-        </tr>
-    </table>
-    <hr>
-    <table>
-        <tr width="100%">
-            <td width="50%">
-                <label for="analytique">Analytique </label>
-                <p>' . $analytique . '</p>
-            </td>
-            <td width="50%">
-                <label for="commentaire">Commentaire</label>
-                <p>' . $commentaire . '</p>
-            </td>
-        </tr>
-    </table>
+    <table class="group">
+                <tr>
+                    <td>
+                        <label for="demandeur">Demandeur :</label>
+                        <p>' . htmlspecialchars($demandeur) . '</p>
+                    </td>
+                    <td>
+                        <label for="service">Service :</label>
+                        <p>' . htmlspecialchars($service) . '</p>
+                    </td>
+                    <td>
+                        <label for="date">Date de la demande :</label>
+                        <p>' . htmlspecialchars($date) . '</p>
+                    </td>
+                </tr>
+            </table>
 
-    </div>
+            <br>
+    
+            <table class="group">
+                <tr>
+                    <td>
+                        <label for="montant">Montant TTC :</label>
+                        <p>' . htmlspecialchars($montant) . '</p>
+                    </td>
+                    <td>
+                        <label for="fournisseur">Fournisseur :</label>
+                        <p>' . htmlspecialchars($fournisseur) . '</p>
+                    </td>
+                    <td>
+                        <label for="mail">Mail du fournisseur :</label>
+                        <p>' . htmlspecialchars($mail) . '</p>
+                    </td>
+                </tr>
+            </table>
 
-</body>
-
-</html>
+            <br>
+    
+            <table class="group">
+                <tr>
+                    <td>
+                        <label for="analytique">Analytique :</label>
+                        <p>' . htmlspecialchars($analytique) . '</p>
+                    </td>
+                    <td colspan="2">
+                        <label for="commentaire">Commentaire :</label>
+                        <p>' . htmlspecialchars($commentaire) . '</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+    </html>
 
         ';
 
 
+        
 
-    creerPDFDepuisHTML($html, $LPODEDNUMBER . "(1)");
+    creerPDFDepuisHTML($html, $LPODEDNUMBER);
 
 
+    // verification dossier pdfs/devis
+    $dossier = __DIR__ . '/pdfs/devis';
+    if (!is_dir($dossier)) {
+        mkdir($dossier);
+    }
 
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Traitement pour chaque devis
         for ($i = 1; $i <= 3; $i++) {
             if ($_FILES["devis$i"]["name"] != "") {
+                echo "<br />";
+                var_dump($_FILES["devis$i"]);
+                
+
                 $fileTmpPath = $_FILES["devis$i"]['tmp_name'];
                 $fileName = $_FILES["devis$i"]['name'];
-                $dest_path = __DIR__ . '/pdfs/' . $LPODEDNUMBER . "(" . ($i + 1) . ").pdf";
+                $dest_path = __DIR__ . '/pdfs/devis/' . $LPODEDNUMBER . "(" . ($i) . ").pdf";
 
                 echo $dest_path;
                 // Déplacer le fichier dans le dossier de destination
@@ -263,68 +322,14 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
         }
     }
 
-    // Concatener les fichiers
-        
-    // recuperer tout les pdfs contenant le numéro de la demande
-    $files = glob(__DIR__ . '/pdfs/*' . $LPODEDNUMBER . "*.pdf");
 
 
-    concatenerPDF(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(1).pdf", __DIR__ . '/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
-
-    // parcourir les fichiers sauf les deux premiers
-    for ($i = 2; $i < count($files); $i++) {
-        concatenerPDF(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf", $files[$i], $LPODEDNUMBER . "tmp");
-    }
-
-    // renommer le fichier tmp en pdf
-    rename(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf", __DIR__ . '/pdfs/LPO-DED-' . $LPODEDNUMBER . ".pdf");
-  
-
-    
-    
-
-    
-
-
-    
-
-
-
-    
-    concatenerPDF(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(1).pdf", __DIR__ . '/pdfs/' . $LPODEDNUMBER . "(2).pdf", $LPODEDNUMBER . "tmp");
-    if ($_FILES["devis3"]["name"] != "") {
-        concatenerPDF(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf", __DIR__ . '/pdfs/' . $LPODEDNUMBER . "(3).pdf", $LPODEDNUMBER);
-    } else {
-        rename(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf", __DIR__ . '/pdfs/' . $LPODEDNUMBER . ".pdf");
-    }
-
-    
-    
-    // Supprimer les fichiers temporaires
-    
-    if (file_exists(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(1).pdf")) {
-        unlink(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(1).pdf");
-    }
-    if (file_exists(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(2).pdf")) {
-        unlink(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(2).pdf");
-    }
-    if (file_exists(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(3).pdf")) {
-        unlink(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(3).pdf");
-    }
-    if (file_exists(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(4).pdf")) {
-        unlink(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "(4).pdf");
-    }
-    if (file_exists(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf")) {
-        unlink(__DIR__ . '/pdfs/' . $LPODEDNUMBER . "tmp.pdf");
-    }
-
-    
 
     
 
 
     // telecharger le fichier dans le navigateur TEMPORAIRE
-
+/*
     $cheminDuFichier = __DIR__ . '/pdfs/LPO-DED-' . $LPODEDNUMBER . ".pdf";
 	
 
@@ -342,6 +347,12 @@ if (isset($_POST['demandeur']) && isset($_POST['service']) && isset($_POST['date
     flush(); // Flush system output buffer
 
     readfile($cheminDuFichier);
+
+    */
+
+
+    // redirection vers la page d'accueil
+    header('Location: index.php');
 	
 	
 

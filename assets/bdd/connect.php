@@ -2,16 +2,17 @@
 
 // connexion à la base de données
 
-$servername = "votre_serveur";
-$username = "votre_nom_utilisateur";
-$password = "votre_mot_de_passe";
-$dbname = "votre_base_de_donnees";
+$servername = $_ENV['DB_HOST'];
+$dbname = $_ENV['DB_NAME'];
+$username = $_ENV['DB_USER'];
+$password = $_ENV['DB_PASSWORD'];
+
 
 try {
-    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    // Définir le mode d'erreur PDO sur exception
+    $conn = new PDO("sqlsrv:Server=$servername;Database=$dbname", $username, $password);
+    // définir le mode d'erreur PDO sur l'exception
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-} catch(PDOException $e) {
-    echo "Erreur : " . $e->getMessage();
+    echo "Connexion à la base de données établie avec succès.";
+} catch (PDOException $e) {
+    echo "<div class='alert alert-danger' role='alert'>Erreur de connexion à la base de données : " . $e->getMessage() . "</div>";
 }

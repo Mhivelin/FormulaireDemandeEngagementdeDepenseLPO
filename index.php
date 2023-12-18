@@ -1,5 +1,12 @@
 <?php
 
+require_once 'vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+$json = file_get_contents('assets/json/data.json');
+
 // recupération des variables du fichier json 
 $json = file_get_contents('assets/json/data.json');
 
@@ -23,18 +30,13 @@ foreach ($json['SERVICES'] as $service) {
     $services[] = $service;
 }
 
-// recupération de la liste des fournisseurs
-require_once 'assets/bdd/fournisseurs.php';
-
-// recupération de la liste des analytiques
-require_once 'assets/bdd/analytiques.php';
-
 
 
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
+    
 
 <head>
     <meta charset="UTF-8">
@@ -51,7 +53,27 @@ require_once 'assets/bdd/analytiques.php';
 
 </head>
 
+
+
 <body>
+
+    <?php
+    // recupération de la liste des fournisseurs
+
+
+    require_once 'assets/bdd/fournisseurs.php';
+
+    // recupération de la liste des analytiques
+    require_once 'assets/bdd/Analytiques.php';
+
+    ?>
+
+
+
+
+
+
+
     <div class="container" id="pdf">
         <div class="row align-items-center mb-4">
             <div class="col-md-4">
@@ -119,11 +141,18 @@ require_once 'assets/bdd/analytiques.php';
                 </div>
                 <div class="col-md">
                     <label for="mail">Mail du fournisseur *</label>
-                    <input type="email" class="form-control" id="mail" name="mail" placeholder="Mail du fournisseur"
+                    <input type="email" class="form-control" id="mailfour" name="mail" placeholder="Mail du fournisseur"
                         required>
                 </div>
 
+                <!-- lien pour envoyer un mail à frederique.sauton@lpo.fr avec patricia.murray@lpo.fr en copie avec le sujet "Création fournisseur LPO" et le corps du mail : Raison sociale : xxxxx, Adresse postale : xxxxx, Siret : xxxxx, RIB : xxxxx, Téléphone : xxxxx, Email : xxxxx, N°TVA : xx -->
+                <p>Merci d'envoyer votre demande de création de fournisseur <a href="mailto:frederique.sauton@lpo.fr?cc=patricia.murray@lpo.fr&subject=Création%20fournisseur%20LPO&body=Raison%20sociale%20:%20xxxxx%0AAdresse%20postale%20:%20xxxxx%0ASiret%20:%20xxxxx%0ARIB%20:%20xxxxx%0ATéléphone%20:%20xxxxx%0AEmail%20:%20xxxxx%0AN°TVA%20:%20xxxxx">ici</a></p>
+
             </div>
+
+            
+
+
 
 
             <div class="col-md">
@@ -133,6 +162,7 @@ require_once 'assets/bdd/analytiques.php';
                     <?php foreach ($analytiques as $analytique) : ?>
                     <option value="<?= $analytique ?>"><?= $analytique ?></option>
                     <?php endforeach; ?>
+                </select>
             </div>
 
             <hr class="separateur">
@@ -153,7 +183,7 @@ require_once 'assets/bdd/analytiques.php';
                     <input type="file" class="form-control" id="devis3" name="devis3" accept=".pdf">
                 </div>
 
-            </div>
+            
 
             <hr class="separateur">
 
@@ -184,6 +214,9 @@ require_once 'assets/bdd/analytiques.php';
 
 
     <script src="assets/js/script.js"></script>
+    <?php
+    /*
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
     </script>
@@ -192,7 +225,8 @@ require_once 'assets/bdd/analytiques.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
 
-
+    */
+    ?>
 
     <script>
 
