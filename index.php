@@ -65,6 +65,7 @@ foreach ($json['SERVICES'] as $service) {
 
     // recupération de la liste des analytiques
     require_once 'assets/bdd/Analytiques.php';
+    
 
     ?>
 

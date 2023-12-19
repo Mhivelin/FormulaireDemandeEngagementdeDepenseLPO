@@ -7,6 +7,7 @@ $dbname = $_ENV['DB_NAME'];
 $username = $_ENV['DB_USER'];
 $password = $_ENV['DB_PASSWORD'];
 
+$conn = null;
 
 try {
     $conn = new PDO("sqlsrv:Server=$servername;Database=$dbname", $username, $password);

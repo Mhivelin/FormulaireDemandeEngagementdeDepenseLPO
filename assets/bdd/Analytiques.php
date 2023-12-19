@@ -6,6 +6,8 @@ $connectionEstablished = false;
 $dataAvailable = false;
 $data = [];
 
+$analytiques = [];
+
 try {
     if ($conn instanceof PDO) {
         $connectionEstablished = true;

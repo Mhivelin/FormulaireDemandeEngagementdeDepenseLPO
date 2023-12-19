@@ -5,6 +5,8 @@ $connectionEstablished = false;
 $dataAvailable = false;
 $data = [];
 
+$fournisseurs = [];
+
 try {
     // Assurez-vous que $conn est un objet PDO valide
     if ($conn instanceof PDO) {
